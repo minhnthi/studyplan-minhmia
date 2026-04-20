@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTAL-TA Study Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0f14;
+  --bg2: #15161d;
+  --bg3: #1c1d27;
+  --bg4: #242535;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8e9f0;
+  --text2: #8e90a6;
+  --text3: #5a5c72;
+  --accent: #7c6cf0;
+  --accent2: #9d91f5;
+  --accent-bg: rgba(124,108,240,0.12);
+  --green: #3ecf8e;
+  --green-bg: rgba(62,207,142,0.1);
+  --red: #f06b6b;
+  --red-bg: rgba(240,107,107,0.1);
+  --amber: #f0b96b;
+  --amber-bg: rgba(240,185,107,0.1);
+  --teal: #4dd9c0;
+  --teal-bg: rgba(77,217,192,0.1);
+  --pink: #e56bcc;
+  --pink-bg: rgba(229,107,204,0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+/* Layout */
+.shell { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.main { flex: 1; overflow: hidden; }
+/* Sidebar */
+.logo {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-text {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: var(--text);
+  line-height: 1.2;
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+.nav { padding: 12px 10px; flex: 1; }
+.nav-section {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  padding: 8px 10px 4px;
+  font-weight: 600;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 13px;
+  transition: all 0.15s;
+  margin-bottom: 1px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--accent-bg); color: var(--accent2); }
+.nav-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+.exam-badge {
+  background: var(--accent-bg);
+  border: 1px solid rgba(124,108,240,0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 12px;
+}
+.exam-badge-title { color: var(--accent2); font-weight: 600; margin-bottom: 4px; }
+.exam-badge-detail { color: var(--text3); font-size: 11px; }
+/* Pages */
+.page { display: none; padding: 32px 40px; max-width: 900px; }
+.page.active { display: block; }
+.page-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.page-sub { color: var(--text2); font-size: 14px; margin-bottom: 28px; }
+/* Study Plan */
+.week-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.week-card:hover { border-color: var(--border2); }
+.week-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+}
+.week-num {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+  flex-shrink: 0;
+}
+.week-info { flex: 1; }
+.week-title-text { font-size: 15px; font-weight: 600; color: var(--text); }
+.week-subtitle { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.week-toggle {
+  font-size: 18px;
+  color: var(--text3);
+  transition: transform 0.2s;
+}
+.week-body {
+  display: none;
+  padding: 0 20px 20px;
+  border-top: 1px solid var(--border);
+}
+.week-body.open { display: block; }
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+.day-box {
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  border: 1px solid var(--border);
+}
+.day-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); font-weight: 600; margin-bottom: 6px; }
+.day-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+.day-kl {
+  display: inline-block;
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 6px;
+  background: var(--accent-bg);
+  color: var(--accent2);
+}
+.week-tip {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--bg4);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.tip-label { font-weight: 600; color: var(--text); margin-right: 4px; }
+/* Quiz */
+.chapter-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.ch-tab {
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.ch-tab:hover { border-color: var(--accent); color: var(--accent2); }
+.ch-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.quiz-area { display: none; }
+.quiz-area.active { display: block; }
+.quiz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.quiz-progress-text { font-size: 13px; color: var(--text2); }
+.quiz-progress-bar {
+  height: 3px;
+  background: var(--bg4);
+  border-radius: 2px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.quiz-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+.q-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 14px;
+}
+.q-num {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  color: var(--text3);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.q-kl-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--amber-bg);
+  color: var(--amber);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.q-text {
+  font-size: 16px;
+  color: var(--text);
+  line-height: 1.65;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+.options { display: flex; flex-direction: column; gap: 8px; }
+.opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--bg3);
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text2);
+  width: 100%;
+}
+.opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); background: var(--accent-bg); }
+.opt.correct { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.opt.wrong { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.opt.reveal-correct { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.opt:disabled { cursor: default; }
+.opt-letter {
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  background: var(--bg4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-weight: 500;
+}
+.opt-text { flex: 1; line-height: 1.5; }
+.explanation {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--bg4);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+  display: none;
+}
+.explanation.show { display: block; }
+.explanation strong { color: var(--text); }
+.q-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.btn {
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-ghost { background: var(--bg4); color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--bg3); }
+.btn-green { background: var(--green-bg); color: var(--green); border: 1px solid rgba(62,207,142,0.3); }
+/* Score */
+.score-board {
+  display: none;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  margin-top: 20px;
+}
+.score-board.show { display: block; }
+.score-big {
+  font-family: 'DM Serif Display', serif;
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.score-label { font-size: 14px; color: var(--text2); margin-bottom: 20px; }
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+.score-stat {
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  border: 1px solid var(--border);
+}
+.score-stat-num { font-size: 22px; font-weight: 600; }
+.score-stat-lbl { font-size: 11px; color: var(--text3); margin-top: 2px; }
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+/* Responsive */
+@media (max-width: 700px) {
+  .sidebar { display: none; }
+  .page { padding: 20px 16px; }
+  .day-grid { grid-template-columns: 1fr 1fr; }
+}
+.badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-family: 'DM Mono', monospace;
+  padding: 3px 8px; border-radius: 5px;
+  font-weight: 500;
+}
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.divider { height: 1px; background: var(--border); margin: 24px 0; }
+.intro-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.intro-stat {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.intro-stat-num { font-size: 22px; font-weight: 600; color: var(--text); }
+.intro-stat-lbl { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.all-done {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text2);
+  display: none;
+}
+.all-done.show { display: block; }
+.all-done-icon { font-size: 40px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-text">CTAL-TA</div>
+      <div class="logo-sub">Study Hub · v4.0</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Menu</div>
+      <button class="nav-item active" onclick="showPage('plan')">
+        <div class="nav-dot" style="background:#7c6cf0"></div>
+        Study Plan
+      </button>
+      <button class="nav-item" onclick="showPage('quiz')">
+        <div class="nav-dot" style="background:#4dd9c0"></div>
+        Quiz theo chương
+      </button>
+      <div class="nav-section" style="margin-top:12px">Chương</div>
+      <button class="nav-item" onclick="showPage('quiz');selectChapter(0)">
+        <div class="nav-dot" style="background:#8e90a6"></div>
+        Ch.1 · Test Process
+      </button>
+      <button class="nav-item" onclick="showPage('quiz');selectChapter(1)">
+        <div class="nav-dot" style="background:#8e90a6"></div>
+        Ch.2 · Risk-Based
+      </button>
+      <button class="nav-item" onclick="showPage('quiz');selectChapter(2)">
+        <div class="nav-dot" style="background:#8e90a6"></div>
+        Ch.3 · Test Techniques
+      </button>
+      <button class="nav-item" onclick="showPage('quiz');selectChapter(3)">
+        <div class="nav-dot" style="background:#8e90a6"></div>
+        Ch.4 · Quality Chars
+      </button>
+      <button class="nav-item" onclick="showPage('quiz');selectChapter(4)">
+        <div class="nav-dot" style="background:#8e90a6"></div>
+        Ch.5 · Defect Prevention
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="exam-badge">
+        <div class="exam-badge-title">Exam Info</div>
+        <div class="exam-badge-detail">40 câu · 90 phút</div>
+        <div class="exam-badge-detail">Pass: 65% (26/40)</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- PLAN PAGE -->
+    <div class="page active" id="page-plan">
+      <div class="page-title">Study Plan</div>
+      <div class="page-sub">Kế hoạch ôn tập 4 tuần · ~2 giờ/ngày</div>
+
+      <div class="intro-grid">
+        <div class="intro-stat"><div class="intro-stat-num" style="color:var(--accent2)">4</div><div class="intro-stat-lbl">Tuần</div></div>
+        <div class="intro-stat"><div class="intro-stat-num" style="color:var(--teal)">36</div><div class="intro-stat-lbl">Learning objectives</div></div>
+        <div class="intro-stat"><div class="intro-stat-num" style="color:var(--amber)">1215'</div><div class="intro-stat-lbl">Nội dung</div></div>
+        <div class="intro-stat"><div class="intro-stat-num" style="color:var(--green)">65%</div><div class="intro-stat-lbl">Điểm qua</div></div>
+      </div>
+
+      <div id="week-cards"></div>
+    </div>
+
+    <!-- QUIZ PAGE -->
+    <div class="page" id="page-quiz">
+      <div class="page-title">Quiz theo chương</div>
+      <div class="page-sub">Chọn chương để bắt đầu luyện tập</div>
+
+      <div class="chapter-tabs" id="chapter-tabs"></div>
+
+      <div id="quiz-chapters"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ===== DATA =====
+const weekData = [
+  {
+    num:1, color:'#7c6cf0', bgColor:'rgba(124,108,240,0.15)',
+    title:'Nền tảng & Quy trình kiểm thử',
+    subtitle:'Chương 1 + 2 — Test Process & Risk-Based Testing',
+    days:[
+      {d:'Thứ 2', t:'Ch.1.1–1.2: Vai trò TA trong SDLC (sequential, incremental, iterative).', k:'K2'},
+      {d:'Thứ 3', t:'Ch.1.2: Test implementation & test execution — nhiệm vụ cụ thể của TA.', k:'K2'},
+      {d:'Thứ 4', t:'Ch.1.3.1–1.3.4: High/low-level test cases, 9 quality criteria, test env, test oracle.', k:'K2'},
+      {d:'Thứ 5', t:'Ch.1.3.5–1.3.7: Test data requirements, keyword-driven testing (thực hành).', k:'K3'},
+      {d:'Thứ 6', t:'Ch.2: Risk analysis, risk control, regression test selection techniques.', k:'K2/K4'},
+      {d:'Cuối tuần', t:'Ôn lại Ch.1–2. Làm flashcard keywords. Mock questions.', k:'Review'},
+    ],
+    tip:'Chú ý phân biệt rõ high-level vs low-level test case và 9 quality criteria (Correctness, Feasibility, Necessity...). Đây hay ra thi.'
+  },
+  {
+    num:2, color:'#4dd9c0', bgColor:'rgba(77,217,192,0.12)',
+    title:'Kỹ thuật kiểm thử — Phần 1',
+    subtitle:'Chương 3 phần đầu — Data-based & Behavior-based',
+    days:[
+      {d:'Thứ 2', t:'Ch.3.1.1: Domain testing — ON/OFF/IN/OUT points, simplified & reliable domain coverage.', k:'K3'},
+      {d:'Thứ 3', t:'Ch.3.1.2–3.1.3: Combinatorial testing (pairwise, base choice), Random testing.', k:'K3/K2'},
+      {d:'Thứ 4', t:'Ch.3.2.1–3.2.2: CRUD testing (tạo CRUD matrix), State transition (N-switch, round-trip).', k:'K2/K3'},
+      {d:'Thứ 5', t:'Ch.3.2.3: Scenario-based testing — activity diagram, use case, simple loop coverage.', k:'K3'},
+      {d:'Thứ 6', t:'Thực hành: Vẽ CRUD matrix, state diagram, viết test cases theo scenario cho hệ thống mẫu.', k:'Thực hành'},
+      {d:'Cuối tuần', t:'Ôn Ch.3.1–3.2. Làm bài tập domain testing và combinatorial testing.', k:'Review'},
+    ],
+    tip:'Domain testing mở rộng từ EP/BVA — cần hiểu kỹ closed vs open border. Với combinatorial, nhớ rằng pairwise testing phát hiện ~97% lỗi theo nghiên cứu.'
+  },
+  {
+    num:3, color:'#f0b96b', bgColor:'rgba(240,185,107,0.12)',
+    title:'Kỹ thuật kiểm thử — Phần 2 & Chất lượng',
+    subtitle:'Chương 3 phần sau + Chương 4',
+    days:[
+      {d:'Thứ 2', t:'Ch.3.3.1: Decision table nâng cao — minimization, don\'t care operator, checksum procedure.', k:'K3'},
+      {d:'Thứ 3', t:'Ch.3.3.2: Metamorphic testing — source/follow-up test cases, metamorphic relations.', k:'K3'},
+      {d:'Thứ 4', t:'Ch.3.4: Test charters (session-based), checklists (read-do vs do-confirm), crowd testing.', k:'K3/K2'},
+      {d:'Thứ 5', t:'Ch.3.5: Chọn kỹ thuật theo product risk (K4). Benefits/risks of automating test design.', k:'K4/K2'},
+      {d:'Thứ 6', t:'Ch.4: Functional (correctness/completeness/appropriateness), Usability, Flexibility, Compatibility.', k:'K2'},
+      {d:'Cuối tuần', t:'Ôn Ch.3–4. Thực hành viết test charter và tối giản decision table.', k:'Review'},
+    ],
+    tip:'Ch.3.5 (K4) là trọng tâm — cần biết kỹ thuật nào phù hợp với loại defect/risk nào. Thường xuất hiện dạng câu hỏi tình huống phức tạp.'
+  },
+  {
+    num:4, color:'#e56bcc', bgColor:'rgba(229,107,204,0.12)',
+    title:'Defect Prevention & Tổng ôn',
+    subtitle:'Chương 5 + Mock exam toàn bộ',
+    days:[
+      {d:'Thứ 2', t:'Ch.5.1–5.2.1: Defect prevention practices, DRE/PCE metrics, modeling để detect defects.', k:'K2/K3'},
+      {d:'Thứ 3', t:'Ch.5.2.2: 5 review techniques — ad hoc, checklist-based, scenario-based, role-based, perspective-based.', k:'K3'},
+      {d:'Thứ 4', t:'Ch.5.3: DDP analysis, defect cluster, structural coverage, test gap. Root cause analysis.', k:'K4/K2'},
+      {d:'Thứ 5', t:'Mock exam lần 1: 40 câu hỏi toàn syllabus. Phân tích đáp án sai kỹ lưỡng.', k:'Mock Exam'},
+      {d:'Thứ 6', t:'Ôn lại điểm yếu từ mock. Đọc lại keywords tất cả chương và learning objectives.', k:'Ôn trọng tâm'},
+      {d:'Cuối tuần', t:'Mock exam lần 2. Ôn ISTQB Glossary. Nghỉ ngơi trước ngày thi.', k:'Mock Exam 2'},
+    ],
+    tip:'5 review techniques hay bị nhầm — hãy lập bảng so sánh. DDP (Defect Detection Percentage) và DRE (Defect Removal Efficiency) khác nhau ở điểm đo.'
+  }
+];
+
+// ===== QUIZ DATA =====
+const quizData = [
+  // Chapter 1
+  {
+    ch:0, chLabel:'Chương 1', kl:'K2',
+    q:'Theo CTAL-TA v4.0, trong mô hình phát triển TUẦN TỰ (sequential), Test Analyst bắt đầu thực hiện test ANALYSIS khi nào?',
+    opts:['Ngay từ giai đoạn đầu khi test planning bắt đầu', 'Khi test basis đang được tạo ra', 'Sau khi toàn bộ phần mềm được implement xong', 'Khi test execution bắt đầu'],
+    ans:1,
+    exp:'Trong sequential model, TA bắt đầu test analysis khi test basis (requirements, specifications...) đang được produced. Test planning support xảy ra sớm hơn, còn test execution là giai đoạn cuối. Điểm khác biệt so với iterative model là trong iterative, TA thực hiện tất cả activities cho mỗi iteration.'
+  },
+  {
+    ch:0, chLabel:'Chương 1', kl:'K2',
+    q:'Đâu là sự khác biệt chính giữa HIGH-LEVEL test case và LOW-LEVEL test case?',
+    opts:['High-level test case có thể được tự động hóa còn low-level thì không', 'High-level test case không chứa preconditions, input data, expected outputs cụ thể; low-level test case chứa tất cả thông tin cụ thể', 'High-level test case chỉ dùng cho system testing, low-level dùng cho unit testing', 'High-level test case được viết bởi Test Manager, low-level được viết bởi Test Analyst'],
+    ans:1,
+    exp:'High-level (abstract/logical) test case mô tả WHAT cần kiểm thử ở mức trừu tượng, không có giá trị cụ thể. Ví dụ: "order > 1 book với giá tạo discount; expected: discount applied". Low-level (concrete/physical) test case chứa dữ liệu cụ thể: "order B1($10) và B2($20), total $30; expected: 10% discount, price $27".'
+  },
+  {
+    ch:0, chLabel:'Chương 1', kl:'K2',
+    q:'Trong TEST DATA REQUIREMENTS, "Pseudonymized data" khác với "Anonymized data" như thế nào?',
+    opts:['Pseudonymized thay thế thông tin cá nhân bằng định danh giả; anonymized xóa hoàn toàn thông tin nhận dạng', 'Pseudonymized dùng cho testing, anonymized dùng cho production', 'Pseudonymized được encrypt; anonymized thì không', 'Không có sự khác biệt, hai thuật ngữ này đồng nghĩa'],
+    ans:0,
+    exp:'Pseudonymized data THAY THẾ thông tin cá nhân bằng artificial identifiers (có thể reverse nếu biết key). Anonymized data XÓA HOÀN TOÀN thông tin có thể nhận diện cá nhân (irreversible). Cả hai đều giúp bảo vệ dữ liệu nhạy cảm trong testing, phù hợp với GDPR.'
+  },
+  {
+    ch:0, chLabel:'Chương 1', kl:'K2',
+    q:'TEST ORACLE PROBLEM xảy ra khi nào?',
+    opts:['Khi không có đủ test data', 'Khi không thể xác định expected results một cách hiệu quả về chi phí', 'Khi test environment không ổn định', 'Khi số lượng test cases quá lớn'],
+    ans:1,
+    exp:'Test oracle problem xảy ra khi không có một test oracle hiệu quả về chi phí (cost-effective). Các yếu tố gây ra gồm: data-related complexity, non-determinism (AI-based systems), probabilistic behavior, và missing/ambiguous requirements. Giải pháp gồm: pseudo-oracles, model-based testing, property-based testing, metamorphic testing, và human oracles.'
+  },
+  {
+    ch:0, chLabel:'Chương 1', kl:'K3',
+    q:'Trong KEYWORD-DRIVEN TESTING, keyword "Authenticate Member" với parameter "member card" thuộc tầng abstraction layer nào?',
+    opts:['Test interface layer — vì nó giao tiếp trực tiếp với test object', 'Domain layer — vì nó phản ánh business action và terminology của application domain', 'Không thuộc tầng nào, nó là một composite keyword', 'Infrastructure layer — vì nó quản lý test environment'],
+    ans:1,
+    exp:'"Authenticate Member" là Domain layer keyword vì: (1) nó phản ánh business action, (2) dùng ngôn ngữ của application domain (member authentication), (3) abstract hóa khỏi chi tiết kỹ thuật của interface. Test interface layer keywords mới là những thứ giao tiếp trực tiếp như "click button login", "enter text field".'
+  },
+  {
+    ch:0, chLabel:'Chương 1', kl:'K2',
+    q:'Quality criterion nào của test case yêu cầu "there should be only one interpretation to avoid false-negative and false-positive results"?',
+    opts:['Correctness', 'Completeness', 'Precision', 'Understandability'],
+    ans:2,
+    exp:'PRECISION nghĩa là test case chỉ có một cách diễn giải. Tránh dùng các từ mơ hồ như "suitable", "as needed", "several". Precision khác với Understandability (dễ hiểu với stakeholders) và Completeness (đủ attributes).'
+  },
+  // Chapter 2
+  {
+    ch:1, chLabel:'Chương 2', kl:'K2',
+    q:'Test Analyst đóng góp vào RISK IDENTIFICATION bằng cách nào?',
+    opts:['Chỉ thực hiện các test case do Test Manager chỉ định', 'Đóng góp kinh nghiệm vào retrospectives, risk workshops, brainstorming, tạo checklists và phỏng vấn stakeholders', 'Quyết định toàn bộ risk level cho tất cả test items', 'Chỉ báo cáo defects được tìm thấy trong test execution'],
+    ans:1,
+    exp:'TA là stakeholder có giá trị trong risk analysis vì sở hữu unique knowledge về system. Trong risk identification, TA đóng góp qua: retrospectives, risk workshops, brainstorming, tạo checklists, và phỏng vấn stakeholders. Trong risk assessment, TA ước lượng các yếu tố như frequency of use, business criticality, financial/reputational damage.'
+  },
+  {
+    ch:1, chLabel:'Chương 2', kl:'K4',
+    q:'Sau khi có một thay đổi lớn trong codebase, TA muốn chọn regression tests nhanh nhất để kiểm tra overall system functionality. Kỹ thuật NÀO phù hợp nhất?',
+    opts:['Risk-based test selection — dựa trên risk register', 'Testing based on operational profiles — dựa trên usage patterns', 'History-based testing — dựa trên past test executions', 'Coverage-based testing — tối đa coverage với ít tests'],
+    ans:1,
+    exp:'Testing based on OPERATIONAL PROFILES phù hợp nhất khi "application changes significantly" vì nó "provides a quick overview of overall system functionality" (trực tiếp từ syllabus). Nó select test cases dựa trên patterns of use — ví dụ: user login → search products → add to cart → place order. Đây là cách nhanh nhất để verify core flows.'
+  },
+  {
+    ch:1, chLabel:'Chương 2', kl:'K4',
+    q:'Công cụ Impact Analysis tự động cho regression test selection hoạt động theo cơ chế nào?',
+    opts:['Phân tích code coverage và chọn tests có coverage thấp nhất', 'Register configuration items được activate khi mỗi test case thực thi, sau đó khi có thay đổi sẽ chọn tests tương tác với items bị modified', 'Chọn tests ngẫu nhiên từ existing test suite', 'Phân tích requirements traceability matrix để chọn tests'],
+    ans:1,
+    exp:'Impact analysis tools hoạt động: (1) Register configuration items được activate trong mỗi test execution, (2) Khi có change, track configuration items bị modified, (3) Select regression tests tương tác với changed items. Đây là kỹ thuật reliable nhất cho automated test selection, dựa trên automated configuration management system.'
+  },
+  // Chapter 3
+  {
+    ch:2, chLabel:'Chương 3', kl:'K3',
+    q:'Trong DOMAIN TESTING, xét border định nghĩa bởi điều kiện "age >= 18". Đây là closed hay open border? Và ON point là gì?',
+    opts:['Open border; ON point = 17', 'Closed border; ON point = 18', 'Open border; ON point = 18', 'Closed border; ON point = 17'],
+    ans:1,
+    exp:'"age >= 18" dùng operator ">=" nên là CLOSED border. Với closed border: ON point NẰM TRÊN border = 18. OFF point NẰM NGOÀI partition và gần nhất = 17. IN point: bất kỳ giá trị trong partition nhưng không phải ON point = ví dụ 25. OUT point: ngoài partition và không phải OFF point = ví dụ 5.'
+  },
+  {
+    ch:2, chLabel:'Chương 3', kl:'K3',
+    q:'RELIABLE DOMAIN COVERAGE yêu cầu gì cho một border với operator ">"?',
+    opts:['Chỉ cần 1 ON point và 1 OFF point', '1 ON point, 1 OFF point, 1 IN point, và 1 OUT point', '2 ON points và 1 OFF point', '1 ON point và 2 OFF points ở hai phía'],
+    ans:1,
+    exp:'Reliable domain coverage yêu cầu cho operators <, ≤, >, ≥: ON + OFF + IN + OUT (4 points). Cho operator =: 1 ON + 2 OFF ở hai phía. Cho operator ≠: 1 OFF + 2 ON ở hai phía. So với Simplified domain coverage (chỉ ON+OFF), Reliable có thêm IN và OUT points nên detect được nhiều domain defects hơn.'
+  },
+  {
+    ch:2, chLabel:'Chương 3', kl:'K2',
+    q:'CRUD TESTING bao gồm hai phần. Phần "Completeness testing" là loại kiểm thử gì và nhằm mục đích gì?',
+    opts:['Dynamic testing kiểm tra consistency giữa các functions', 'Static testing kiểm tra xem tất cả operations (C, R, U, D) có xảy ra với mọi entity không', 'Performance testing kiểm tra tốc độ CRUD operations', 'Integration testing kiểm tra kết nối database'],
+    ans:1,
+    exp:'Completeness testing là STATIC testing kiểm tra CRUD matrix để verify tất cả 4 operations (C, R, U, D) đều xảy ra với mỗi entity. Sự vắng mặt của một operation là anomaly cần điều tra. Consistency testing (phần 2) mới là dynamic testing kiểm tra functions interact đúng khi handling entity.'
+  },
+  {
+    ch:2, chLabel:'Chương 3', kl:'K3',
+    q:'N-SWITCH COVERAGE: 0-switch coverage tương đương với coverage criterion nào từ Foundation Level?',
+    opts:['All states coverage', 'Valid transitions coverage', 'All invalid transitions coverage', 'Round-trip coverage'],
+    ans:1,
+    exp:'0-switch coverage = valid transitions coverage (từ CTFL). 0-switch là sequences có 0+1=1 consecutive transition. 1-switch là pair of incoming + outgoing transitions tại một state. 2-switch và cao hơn chỉ nên dùng khi có high risk of failure do unexpected event sequences vì số N-switches tăng exponentially.'
+  },
+  {
+    ch:2, chLabel:'Chương 3', kl:'K3',
+    q:'Trong METAMORPHIC TESTING, xét function tính average của một dãy số. Metamorphic Relation (MR) nào sau đây HỢP LỆ?',
+    opts:['Nếu thêm một số vào dãy, average không đổi', 'Nếu hoán vị thứ tự các số trong dãy, average không đổi', 'Nếu xóa số lớn nhất, average tăng', 'Nếu nhân tất cả với 0, average vẫn bằng average ban đầu'],
+    ans:1,
+    exp:'MR "hoán vị dãy số → average không đổi" là hợp lệ vì đây là property toán học đúng. Follow-up test cases: lấy same set of numbers, sắp xếp theo nhiều thứ tự khác nhau, expected result vẫn như nhau. MR này hữu ích khi không biết exact expected result (test oracle problem).'
+  },
+  {
+    ch:2, chLabel:'Chương 3', kl:'K3',
+    q:'Test Analyst chuẩn bị TEST CHARTER cho session-based testing. Format mission "Explore [target] With [resources] To discover [information]" — [resources] mô tả điều gì?',
+    opts:['Những gì TA sẽ tìm kiếm (loại defects, quality characteristics)', 'Những gì TA sẽ sử dụng (test data, configurations, tools, restrictions)', 'Phạm vi testing (area, feature, risk, component)', 'Thời gian và ngân sách dành cho session'],
+    ans:1,
+    exp:'Trong format Hendrickson: [target] = what to explore (area, feature, risk, component, requirement); [resources] = what TA will USE (test data, configurations, tools, restrictions, heuristics, dependencies); [information] = what type of info to find (quality characteristic evaluations, expected defect types, standards violations).'
+  },
+  {
+    ch:2, chLabel:'Chương 3', kl:'K2',
+    q:'BASE CHOICE COVERAGE trong combinatorial testing hoạt động như thế nào?',
+    opts:['Chọn ngẫu nhiên các combinations của parameter values', 'Chọn một base parameter-value pair cho mỗi parameter, tạo base coverage item, rồi thay thế từng base value bằng non-base values', 'Chọn tất cả possible pairs của bất kỳ 2 parameters nào', 'Chọn combinations có độ phức tạp cao nhất'],
+    ans:1,
+    exp:'Base choice coverage: (1) Chọn một BASE value cho mỗi parameter (thường là value "thông thường nhất"), (2) Base coverage item = combination của tất cả base values, (3) Tạo subsequent items bằng cách thay từng base value bằng non-base values (1 lần 1). So với pairwise, base choice ít test cases hơn nhưng kém rigorous hơn.'
+  },
+  {
+    ch:2, chLabel:'Chương 3', kl:'K4',
+    q:'Hệ thống cần kiểm tra tính tương thích với 3 OS (Win/Mac/Linux) × 4 browsers × 2 screen sizes. Kỹ thuật test nào PHẢI dùng để giảm số test cases xuống mức hợp lý?',
+    opts:['State transition testing', 'Decision table testing', 'Combinatorial testing (pairwise coverage)', 'Scenario-based testing'],
+    ans:2,
+    exp:'Đây là adaptability testing với environment parameters (OS, browser, screen). Combinatorial testing (đặc biệt pairwise) là chuẩn cho loại bài này. 3×4×2=24 full combinations, nhưng pairwise chỉ cần khoảng 12 test cases trong khi vẫn cover tất cả cặp OS-browser, OS-screen, browser-screen. Syllabus Ch.4.3 cũng confirm combinatorial testing cho adaptability testing.'
+  },
+  {
+    ch:2, chLabel:'Chương 3', kl:'K2',
+    q:'CROWD TESTING có limitation nào về SECURITY?',
+    opts:['Crowd testers không có kỹ năng testing', 'Sharing software với external testers tạo data security và confidentiality risks', 'Không thể đảm bảo reproducibility của defects', 'Chi phí quản lý crowd testers quá cao'],
+    ans:1,
+    exp:'Security là limitation chính: sharing software với external testers tạo risks về data security và confidentiality. Tuy nhiên, syllabus lưu ý "Proper measures can mitigate these risks, allowing for responsible use without disclosing sensitive details or facilitating plagiarism". Đây không phải lý do hoàn toàn tránh crowd testing.'
+  },
+  // Chapter 4
+  {
+    ch:3, chLabel:'Chương 4', kl:'K2',
+    q:'FUNCTIONAL COMPLETENESS testing trả lời câu hỏi nào?',
+    opts:['Các kết quả có chính xác không?', 'Software có làm đúng những gì được yêu cầu không? (Is everything asked for implemented?)', 'Functions có giúp người dùng hoàn thành tasks không?', 'Phần mềm có chạy đúng trên các môi trường khác nhau không?'],
+    ans:1,
+    exp:'Functional suitability gồm 3 sub-characteristics: (1) Completeness = "Is everything asked for IMPLEMENTED?" (2) Correctness = "Are results CORRECT for valid/invalid inputs?" (3) Appropriateness = "Do functions HELP users accomplish tasks?" (focus on user needs fulfillment). Đây là ba câu hỏi khác nhau cần nhớ.'
+  },
+  {
+    ch:3, chLabel:'Chương 4', kl:'K2',
+    q:'Test Analyst đóng góp vào USABILITY TEST SESSIONS như thế nào?',
+    opts:['Trực tiếp conduct toàn bộ usability test session', 'Đóng góp bằng cách design scenarios theo personas, user groups, hoặc operational profiles', 'Chỉ quan sát và không tham gia trực tiếp', 'Viết usability requirements cho developers'],
+    ans:1,
+    exp:'TA contributes to usability test sessions bằng cách DESIGN scenarios dựa trên personas, user groups, hoặc operational profiles. Usability test sessions involve future users/representatives trying to solve predefined tasks. TA cũng có thể contribute to usability reviews (tailoring checklists) và user questionnaires (design và evaluate responses).'
+  },
+  {
+    ch:3, chLabel:'Chương 4', kl:'K2',
+    q:'INTEROPERABILITY TESTING khác với COEXISTENCE TESTING như thế nào theo ISO 25010?',
+    opts:['Interoperability testing kiểm tra performance, coexistence kiểm tra security', 'Interoperability: kiểm tra khả năng exchange & use thông tin với components khác; Coexistence: kiểm tra có thể share environment mà không interference', 'Interoperability do TA, coexistence do TTA — không có sự khác biệt kỹ thuật', 'Interoperability dùng black-box, coexistence dùng white-box techniques'],
+    ans:1,
+    exp:'Theo ISO 25010, Compatibility có 2 sub-characteristics: (1) Interoperability = exchange & mutual use of information với intended systems (TA phụ trách, black-box functional tests); (2) Coexistence = share environment với other components WITHOUT interference (TTA phụ trách, technical test). Interoperability quan trọng đặc biệt trong cloud, microservices, IoT.'
+  },
+  // Chapter 5
+  {
+    ch:4, chLabel:'Chương 5', kl:'K2',
+    q:'DEFECT REMOVAL EFFICIENCY (DRE) và PHASE CONTAINMENT EFFECTIVENESS (PCE) đo lường điều gì khác nhau?',
+    opts:['DRE đo defects trong testing, PCE đo defects trong production', 'DRE đo tỷ lệ defects removed trước release / tổng defects; PCE đo số defects introduced và removed trong CÙNG phase / tổng defects introduced trong phase đó', 'DRE và PCE đo cùng một thứ nhưng dùng công thức khác nhau', 'DRE cho static testing, PCE cho dynamic testing'],
+    ans:1,
+    exp:'DRE = defects removed before release / total defects (denominator ước lượng hoặc là tổng defects found đến 6 tháng sau release). PCE = defects introduced AND removed in same phase / total defects introduced in that phase. PCE đo phase containment hiệu quả, còn DRE không phân biệt được defects caught qua prevention vs detection.'
+  },
+  {
+    ch:4, chLabel:'Chương 5', kl:'K3',
+    q:'Khi reviewing một ACTIVITY DIAGRAM, Test Analyst phát hiện một decision node có 3 outgoing paths nhưng guard conditions không bao phủ hết mọi trường hợp. Đây là loại defect gì?',
+    opts:['Syntax error trong diagram notation', 'Incomplete guard conditions — không có exhaustive coverage of all cases', 'Missing synchronization point trong parallel flow', 'Wrong order of actions'],
+    ans:1,
+    exp:'Activity diagram defects: missing/unreachable/dead-end actions, incorrect order, WRONG/NON-EXCLUSIVE/INCOMPLETE guard conditions in decision nodes, missing synchronization points, improperly synchronized parallel flows. Decision node với guard conditions không cover hết cases = INCOMPLETE guard conditions — một trong những defect phổ biến nhất.'
+  },
+  {
+    ch:4, chLabel:'Chương 5', kl:'K3',
+    q:'PERSPECTIVE-BASED READING yêu cầu reviewer làm gì ngoài việc đọc test basis?',
+    opts:['Đọc từ nhiều góc nhìn nhưng không cần làm gì thêm', 'Attempt to USE the test basis to generate the work product they would derive from it (e.g., tester tạo draft acceptance tests từ requirements)', 'Phân công reviewer theo role trong tổ chức', 'Sử dụng checklist có sẵn để review'],
+    ans:1,
+    exp:'Perspective-based reading REQUIRES reviewers attempt to USE the test basis to generate their work product. Ví dụ: tester tạo draft acceptance tests từ requirements specs. Điều này lead to more in-depth reviewing với less duplication. Đây là điểm khác biệt chính so với role-based reviewing (phân công theo roles) và checklist-based (dùng predefined checklist).'
+  },
+  {
+    ch:4, chLabel:'Chương 5', kl:'K4',
+    q:'Test Analyst phân tích defect data và phát hiện rằng Defect Detection Percentage (DDP) ở system testing là 40% (thay vì 70% expected). Điều này có nghĩa là gì và TA nên làm gì?',
+    opts:['DDP 40% là tốt vì còn ít defects trong system', 'DDP thấp = high percentage of escaped defects — TA nên phân tích nguyên nhân và đề xuất measures làm test level rigorously và focused hơn', 'DDP 40% chỉ cho thấy test cases quá nhiều', 'TA nên giảm số test cases để tăng DDP'],
+    ans:1,
+    exp:'DDP thấp (40% thay vì 70%) = nhiều defects escaped khỏi system testing. TA nên: (1) phân tích reasons, (2) propose measures to improve: làm test level more focused và rigorous. Nên divide DDP by severity levels vì priority để giảm escaped defects phụ thuộc vào severity của chúng. Đây là K4 question — analyze để propose actions.'
+  },
+  {
+    ch:4, chLabel:'Chương 5', kl:'K2',
+    q:'ORTHOGONAL DEFECT CLASSIFICATION (ODC) thu thập thông tin defect VÀO HAI thời điểm nào?',
+    opts:['Khi defect được phát hiện và khi defect được assign cho developer', 'Khi defect được reported và khi defect được fixed', 'Khi test execution bắt đầu và khi kết thúc', 'Khi sprint planning và khi sprint review'],
+    ans:1,
+    exp:'ODC (Orthogonal Defect Classification, Chillarege 1992) classifies mỗi defect theo các orthogonal (mutually exclusive) attributes, collected TẠI HAI THỜI ĐIỂM: (1) khi defect được REPORTED và (2) khi defect được FIXED. Điều này cho phép correlation giữa defect characteristics khi phát hiện và khi fix, giúp process improvement.'
+  }
+];
+
+// ===== STATE =====
+let quizState = {};
+const numChapters = 5;
+for(let i=0;i<numChapters;i++){
+  quizState[i] = { current: 0, score: 0, answered: [], done: false };
+}
+
+// ===== RENDER PLAN =====
+function renderPlan() {
+  const container = document.getElementById('week-cards');
+  weekData.forEach((w, wi) => {
+    const card = document.createElement('div');
+    card.className = 'week-card';
+    let daysHtml = '<div class="day-grid">';
+    w.days.forEach(d => {
+      daysHtml += `<div class="day-box">
+        <div class="day-name">${d.d}</div>
+        <div class="day-text">${d.t}</div>
+        <span class="day-kl">${d.k}</span>
+      </div>`;
+    });
+    daysHtml += '</div>';
+    card.innerHTML = `
+      <div class="week-header" onclick="toggleWeek(${wi})">
+        <div class="week-num" style="background:${w.bgColor};color:${w.color}">W${w.num}</div>
+        <div class="week-info">
+          <div class="week-title-text">${w.title}</div>
+          <div class="week-subtitle">${w.subtitle}</div>
+        </div>
+        <div class="week-toggle" id="wtog-${wi}">›</div>
+      </div>
+      <div class="week-body ${wi===0?'open':''}" id="wbody-${wi}">
+        ${daysHtml}
+        <div class="week-tip" style="border-color:${w.color}">
+          <span class="tip-label">Lưu ý:</span>${w.tip}
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+  document.getElementById('wtog-0').textContent = '⌄';
+}
+
+function toggleWeek(i) {
+  const body = document.getElementById('wbody-' + i);
+  const tog = document.getElementById('wtog-' + i);
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.week-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.week-toggle').forEach(t => t.textContent = '›');
+  if(!isOpen) { body.classList.add('open'); tog.textContent = '⌄'; }
+}
+
+// ===== RENDER QUIZ =====
+function renderQuizTabs() {
+  const chLabels = ['Ch.1 · Test Process','Ch.2 · Risk-Based','Ch.3 · Techniques','Ch.4 · Quality','Ch.5 · Defect Prevention'];
+  const tabsEl = document.getElementById('chapter-tabs');
+  const chaptersEl = document.getElementById('quiz-chapters');
+  chLabels.forEach((lbl, i) => {
+    const tab = document.createElement('button');
+    tab.className = 'ch-tab' + (i===0?' active':'');
+    tab.textContent = lbl;
+    tab.onclick = () => selectChapter(i);
+    tabsEl.appendChild(tab);
+  });
+  for(let i=0;i<numChapters;i++) {
+    const div = document.createElement('div');
+    div.className = 'quiz-area' + (i===0?' active':'');
+    div.id = 'quiz-ch-' + i;
+    chaptersEl.appendChild(div);
+    renderChapterQuiz(i);
+  }
+}
+
+function selectChapter(i) {
+  document.querySelectorAll('.ch-tab').forEach((t,j) => t.classList.toggle('active', j===i));
+  document.querySelectorAll('.quiz-area').forEach((a,j) => a.classList.toggle('active', j===i));
+}
+
+function getChapterQuestions(chIdx) {
+  return quizData.filter(q => q.ch === chIdx);
+}
+
+function renderChapterQuiz(chIdx) {
+  const qs = getChapterQuestions(chIdx);
+  const el = document.getElementById('quiz-ch-' + chIdx);
+  const s = quizState[chIdx];
+  if(qs.length === 0) { el.innerHTML = '<p style="color:var(--text2)">Chưa có câu hỏi cho chương này.</p>'; return; }
+  const total = qs.length;
+  const pct = Math.round((s.answered.length / total) * 100);
+
+  let html = `
+    <div class="quiz-header">
+      <div class="quiz-progress-text">Câu ${Math.min(s.current+1, total)} / ${total}</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="badge badge-green">✓ ${s.answered.filter(a=>a).length} đúng</span>
+        <span class="badge badge-red">✗ ${s.answered.filter(a=>!a).length} sai</span>
+      </div>
+    </div>
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>`;
+
+  if(s.done) {
+    const correct = s.answered.filter(a=>a).length;
+    const pctScore = Math.round((correct/total)*100);
+    html += `<div class="score-board show">
+      <div class="score-big" style="color:${pctScore>=65?'var(--green)':'var(--red)'}">${pctScore}%</div>
+      <div class="score-label">Kết quả Chương ${chIdx+1}</div>
+      <div class="score-grid">
+        <div class="score-stat"><div class="score-stat-num" style="color:var(--green)">${correct}</div><div class="score-stat-lbl">Câu đúng</div></div>
+        <div class="score-stat"><div class="score-stat-num" style="color:var(--red)">${total-correct}</div><div class="score-stat-lbl">Câu sai</div></div>
+        <div class="score-stat"><div class="score-stat-num" style="color:var(--accent2)">${total}</div><div class="score-stat-lbl">Tổng câu</div></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
+        <button class="btn btn-primary" onclick="resetChapter(${chIdx})">Làm lại từ đầu</button>
+      </div>
+    </div>`;
+  } else {
+    const q = qs[s.current];
+    const isAnswered = s.current < s.answered.length;
+    const userAns = isAnswered ? s.userAnswers[s.current] : null;
+
+    html += `<div class="q-card">
+      <div class="q-num">Câu ${s.current+1} · ${q.chLabel} <span class="q-kl-badge">${q.kl}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">`;
+    q.opts.forEach((opt, oi) => {
+      let cls = '';
+      if(isAnswered) {
+        if(oi === q.ans) cls = oi === userAns ? 'correct' : 'reveal-correct';
+        else if(oi === userAns && oi !== q.ans) cls = 'wrong';
+      }
+      html += `<button class="opt ${cls}" ${isAnswered?'disabled':''} onclick="answerQ(${chIdx},${oi})">
+        <span class="opt-letter">${String.fromCharCode(65+oi)}</span>
+        <span class="opt-text">${opt}</span>
+      </button>`;
+    });
+    html += `</div>`;
+    if(isAnswered) {
+      html += `<div class="explanation show"><strong>Giải thích:</strong> ${q.exp}</div>`;
+    }
+    html += `<div class="q-actions">`;
+    if(isAnswered && s.current < total-1) {
+      html += `<button class="btn btn-primary" onclick="nextQ(${chIdx})">Câu tiếp theo →</button>`;
+    } else if(isAnswered && s.current === total-1) {
+      html += `<button class="btn btn-green" onclick="finishChapter(${chIdx})">Xem kết quả</button>`;
+    }
+    if(s.current > 0) {
+      html += `<button class="btn btn-ghost" onclick="prevQ(${chIdx})">← Câu trước</button>`;
+    }
+    html += `</div></div>`;
+  }
+  el.innerHTML = html;
+}
+
+function answerQ(chIdx, optIdx) {
+  const s = quizState[chIdx];
+  const qs = getChapterQuestions(chIdx);
+  const q = qs[s.current];
+  if(!s.userAnswers) s.userAnswers = [];
+  if(s.current < s.answered.length) return;
+  const isCorrect = optIdx === q.ans;
+  s.answered.push(isCorrect);
+  s.userAnswers.push(optIdx);
+  if(isCorrect) s.score++;
+  renderChapterQuiz(chIdx);
+}
+
+function nextQ(chIdx) {
+  const s = quizState[chIdx];
+  const total = getChapterQuestions(chIdx).length;
+  if(s.current < total-1) { s.current++; renderChapterQuiz(chIdx); }
+}
+
+function prevQ(chIdx) {
+  const s = quizState[chIdx];
+  if(s.current > 0) { s.current--; renderChapterQuiz(chIdx); }
+}
+
+function finishChapter(chIdx) {
+  quizState[chIdx].done = true;
+  renderChapterQuiz(chIdx);
+}
+
+function resetChapter(chIdx) {
+  quizState[chIdx] = { current: 0, score: 0, answered: [], userAnswers: [], done: false };
+  renderChapterQuiz(chIdx);
+}
+
+// ===== NAV =====
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if(id === 'plan') document.querySelectorAll('.nav-item')[0].classList.add('active');
+  else document.querySelectorAll('.nav-item')[1].classList.add('active');
+}
+
+// ===== INIT =====
+renderPlan();
+renderQuizTabs();
+</script>
+</body>
+</html>
